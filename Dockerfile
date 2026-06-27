@@ -1,10 +1,10 @@
-FROM node:22
-ENV NODE_ENV=development
+# ---------- BASE ----------
+FROM node:22 AS base
 
 WORKDIR /usr/src/app
 
 COPY shared ./shared
-COPY turbo.json  ./
+COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.json ./
@@ -12,11 +12,14 @@ COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
-#COPY services/gateway/prisma ./services/gateway/prisma/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
 
-USER root
 
+# ---------- DEV ----------
+FROM base AS dev
+ENV NODE_ENV=development
+
+USER root
 RUN corepack enable && pnpm install
 RUN chown -R node:node /usr/src/app
 
@@ -31,7 +34,20 @@ HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
 
 
+# ---------- PROD ----------
+FROM base AS prod
+ENV NODE_ENV=production
 
+USER root
+RUN corepack enable && pnpm install --frozen-lockfile --prod
+RUN chown -R node:node /usr/src/app
 
+USER node
 
+EXPOSE 50051
+EXPOSE 9090
 
+CMD ["node", "services/gateway/dist/app.js"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:9090/livez || exit 1
