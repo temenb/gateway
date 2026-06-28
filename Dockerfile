@@ -4,6 +4,7 @@ FROM node:22 AS base
 WORKDIR /usr/src/app
 
 COPY shared ./shared
+COPY pnpm-lock.yaml ./
 COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
@@ -39,7 +40,7 @@ FROM base AS prod
 ENV NODE_ENV=production
 
 USER root
-RUN corepack enable && pnpm install --frozen-lockfile --prod
+RUN corepack enable && pnpm install --frozen-lockfile --prod && pnpm run --filter gateway build
 RUN chown -R node:node /usr/src/app
 
 USER node
