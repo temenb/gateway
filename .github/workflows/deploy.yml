@@ -19,4 +19,4 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.MONOREPO_TOKEN }}" \
             https://api.github.com/repos/temenb/game/dispatches \
-            -d '{"event_type":"auth-updated","client_payload":{"service":"auth"}}'
+            -d '{"event_type":"service-updated","client_payload":{"service":"auth"}}'
