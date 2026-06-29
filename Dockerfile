@@ -26,6 +26,7 @@ RUN corepack enable \
  && pnpm run --filter gateway build \
  && pnpm prune --prod
 
+
 # ---------- DEV ----------
 FROM build AS dev
 
@@ -49,11 +50,6 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
 
-RUN pnpm run --filter @shared/logger build
-RUN pnpm run --filter @shared/grpc-client-manager build
-RUN pnpm run --filter gateway build
-
-
 #COPY --from=build /usr/src/app /usr/src/app
 
 COPY --from=build /usr/src/app/node_modules ./node_modules
@@ -69,7 +65,7 @@ USER node
 EXPOSE 50051
 EXPOSE 9090
 
-CMD ["node", "services/gateway/dist/app.js"]
+CMD ["node", "dist/services/gateway/src/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
