@@ -28,10 +28,12 @@ RUN corepack enable
 RUN pnpm install --frozen-lockfile
 RUN mkdir ./services/gateway/src/grpc/generated -p
 RUN pnpm run --filter gateway proto:generate
-RUN pnpm run --filter @shared/logger build
-RUN pnpm run --filter @shared/grpc-client-manager build
-RUN pnpm run --filter gateway build
-RUN pnpm install --prod
+#RUN pnpm run --filter @shared/logger build
+#RUN pnpm run --filter @shared/grpc-client-manager build
+#RUN pnpm run --filter gateway build
+RUN pnpm install
+RUN pnpm run -r build
+RUN pnpm prune --prod
 
 # ---------- DEV ----------
 FROM build AS dev
