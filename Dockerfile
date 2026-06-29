@@ -9,6 +9,7 @@ COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.json ./
+COPY proto ./proto
 
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
