@@ -22,12 +22,13 @@ FROM base AS build
 
 ENV NODE_ENV=development
 
+RUN apt-get update && apt-get install -y protobuf-compiler
+
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
 RUN pnpm run --filter gateway proto:generate
 RUN pnpm run --filter gateway build
-RUN pnpm prune --prod
-
+RUN pnpm install --prod
 
 # ---------- DEV ----------
 FROM build AS dev
@@ -51,16 +52,22 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-#COPY --from=build /usr/src/app /usr/src/app
+#RUN pnpm deploy --filter gateway /out
+
+##COPY --from=build /usr/src/app /usr/src/app
+
 COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/services/gateway/node_modules ./services/gateway/node_modules
+COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
+COPY --from=build /usr/src/app/shared ./shared
+
 
 USER node
 
 EXPOSE 50051
 EXPOSE 9090
 
-CMD ["node", "dist/services/gateway/src/app.js"]
+CMD ["node", "./services/gateway/dist/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
