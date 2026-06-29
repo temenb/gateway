@@ -74,13 +74,11 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Generated new version: $VERSION"
 
-      - name: Create release tag
-        #if: github.ref_name == 'prod'
+      - name: Push release tag
         run: |
-          git tag -a $VERSION -m "Release $VERSION"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${GITHUB_REPOSITORY}.git
           git push origin $VERSION
 
-  
 
   notify-monorepo:
     runs-on: ubuntu-latest
