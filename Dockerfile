@@ -21,11 +21,11 @@ FROM base AS build
 
 ENV NODE_ENV=development
 
-RUN corepack enable \
- && pnpm install --frozen-lockfile \
- && pnpm run proto:generate \
- && pnpm run --filter gateway build \
- && pnpm prune --prod
+RUN corepack enable
+RUN pnpm install --frozen-lockfile
+RUN pnpm run proto:generate
+RUN pnpm run --filter gateway build
+RUN pnpm prune --prod
 
 
 # ---------- DEV ----------
