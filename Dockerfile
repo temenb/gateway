@@ -26,7 +26,6 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
-RUN pwd
 RUN mkdir ./services/gateway/src/grpc/generated -p
 RUN pnpm run --filter gateway proto:generate
 RUN pnpm run --filter gateway build
