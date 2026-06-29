@@ -9,20 +9,27 @@ COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.json ./
+
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
 
+# ---------- BUILD ----------
+FROM base AS build
 
-# ---------- DEV ----------
-FROM base AS dev
 ENV NODE_ENV=development
 
-USER root
-RUN corepack enable && pnpm install
-RUN chown -R node:node /usr/src/app
+RUN corepack enable \
+ && pnpm install --frozen-lockfile \
+ && pnpm run --filter gateway build \
+ && pnpm prune --prod
+
+# ---------- DEV ----------
+FROM build AS dev
+
+ENV NODE_ENV=development
 
 USER node
 
@@ -34,14 +41,28 @@ CMD ["pnpm", "--filter", "gateway", "start"]
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
 
-
 # ---------- PROD ----------
-FROM base AS prod
+FROM node:22 AS prod
+
+WORKDIR /usr/src/app
+
 ENV NODE_ENV=production
 
-USER root
-RUN corepack enable && pnpm install --frozen-lockfile --prod && pnpm run --filter gateway build
-RUN chown -R node:node /usr/src/app
+
+RUN pnpm run --filter @shared/logger build
+RUN pnpm run --filter @shared/grpc-client-manager build
+RUN pnpm run --filter gateway build
+
+
+#COPY --from=build /usr/src/app /usr/src/app
+
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/package.json ./package.json
+COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
+COPY --from=build /usr/src/app/shared/*/dist ./shared/*/dist
+COPY --from=build /usr/src/app/shared/*/package.json ./shared/*/package.json
+
+#COPY --from=build /usr/src/app/shared ./shared
 
 USER node
 
