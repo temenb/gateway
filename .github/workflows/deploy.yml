@@ -74,14 +74,16 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Generated new version: $VERSION"
 
-      - name: Push release tag
+      - name: Create and push release tag
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${GITHUB_REPOSITORY}.git
+          git tag -a $VERSION -m "Release $VERSION"
           git push origin $VERSION
 
 
   notify-monorepo:
     runs-on: ubuntu-latest
+    depends-on: determine-version
     steps:
       - name: Checkout auth repo
         uses: actions/checkout@v4
