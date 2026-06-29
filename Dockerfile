@@ -23,7 +23,7 @@ ENV NODE_ENV=development
 
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
-RUN pnpm run proto:generate
+RUN pnpm run --filter gateway proto:generate
 RUN pnpm run --filter gateway build
 RUN pnpm prune --prod
 
