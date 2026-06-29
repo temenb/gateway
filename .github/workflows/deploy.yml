@@ -83,7 +83,7 @@ jobs:
 
   notify-monorepo:
     runs-on: ubuntu-latest
-    depends-on: determine-version
+    needs: determine-version
     steps:
       - name: Checkout auth repo
         uses: actions/checkout@v4
