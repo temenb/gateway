@@ -16,6 +16,7 @@ COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
+#COPY services/gateway/prisma ./services/gateway/prisma/
 
 # ---------- BUILD ----------
 FROM base AS build
@@ -31,8 +32,8 @@ RUN pnpm install
 RUN pnpm run --filter gateway proto:generate
 RUN pnpm --filter @shared/logger build
 RUN pnpm --filter @shared/grpc-client-manager build
-RUN pnpm --filter @shared/kafka-manager build
-RUN #pnpm --filter @shared/pg-boss-manager
+#RUN pnpm --filter @shared/kafka-manager build
+#RUN pnpm --filter @shared/pg-boss-manager buld
 RUN pnpm --filter gateway build
 RUN pnpm prune --prod
 
