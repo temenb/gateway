@@ -1,4 +1,4 @@
-import express, {NextFunction, Request, Response} from 'express';
+import express, {Express, NextFunction, Request, Response} from 'express';
 import morgan from 'morgan';
 import gatewayRoutes from './routes/gateway.routes';
 import authRoutes from './routes/auth.routes';
@@ -8,7 +8,7 @@ import publicPaths from "./routes/public.paths";
 import cors from 'cors'
 import cookieParser from "cookie-parser";
 
-const app = express();
+const app: Express = express();
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(cors({

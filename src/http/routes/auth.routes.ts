@@ -1,7 +1,9 @@
-import {Router} from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
+
 import * as authController from '../controllers/auth.controller';
 
-const router = Router();
+const router: ExpressRouter = Router();
+
 
 router.get('/health', authController.health);
 router.get('/status', authController.status);

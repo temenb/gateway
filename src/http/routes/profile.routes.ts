@@ -1,7 +1,9 @@
-import {Router} from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
+
 import * as profileController from '../controllers/profile.controller';
 
-const router = Router();
+const router: ExpressRouter = Router();
+
 
 router.get('/health', profileController.health);
 router.get('/status', profileController.status);
