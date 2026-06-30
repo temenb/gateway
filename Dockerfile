@@ -27,12 +27,12 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
 RUN mkdir ./services/gateway/src/grpc/generated -p
-RUN pnpm run --filter gateway proto:generate
-#RUN pnpm run --filter @shared/logger build
-#RUN pnpm run --filter @shared/grpc-client-manager build
-#RUN pnpm run --filter gateway build
 RUN pnpm install
-RUN pnpm run -r build
+RUN pnpm run --filter gateway proto:generate
+RUN pnpm run --filter @shared/logger build
+RUN pnpm run --filter @shared/grpc-client-manager build
+RUN pnpm run --filter gateway build
+#RUN pnpm run -r build
 RUN pnpm prune --prod
 
 # ---------- DEV ----------
