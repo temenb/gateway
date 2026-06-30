@@ -13,7 +13,7 @@ COPY proto ./proto
 
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
-COPY services/gateway/tsconfig.json ./services/gateway/
+COPY services/gateway/tsconfig.base.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
 #COPY services/gateway/prisma ./services/gateway/prisma/
