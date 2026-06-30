@@ -29,12 +29,7 @@ RUN pnpm install --frozen-lockfile
 RUN mkdir ./services/gateway/src/grpc/generated -p
 RUN pnpm install
 RUN pnpm run --filter gateway proto:generate
-#RUN pnpm --filter @shared/logger build
-#RUN pnpm --filter @shared/grpc-client-manager build
-#RUN pnpm --filter @shared/kafka-manager build
-#RUN pnpm --filter gateway build
-#RUN pnpm --filter gateway build
-RUN pnpm -r build
+RUN pnpm --filter gateway build
 RUN pnpm prune --prod
 
 # ---------- DEV ----------
