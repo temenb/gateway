@@ -41,7 +41,7 @@ RUN pnpm prune --prod
 
 
 # ---------- PREDEPLOY ----------
-FROM build AS predeploy
+FROM node:22 AS predeploy
 
 CMD ["sh", "-c", "echo 'no predeploy step'"]
 
