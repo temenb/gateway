@@ -3,17 +3,17 @@ FROM node:22 AS base
 
 WORKDIR /usr/src/app
 
+# workspace metadata
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.base.json ./
+
+# shared + proto
 COPY shared ./shared
-COPY pnpm-lock.yaml ./
-COPY turbo.json ./
-COPY package.json ./
-COPY pnpm-workspace.yaml ./
-COPY tsconfig.base.json ./
 COPY proto ./proto
 
+# gateway service
 COPY services/gateway/package*.json ./services/gateway/
-COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
+COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
 
@@ -27,45 +27,28 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
+# grpc generation
 RUN mkdir -p ./services/gateway/src/grpc/generated
 RUN pnpm run --filter gateway proto:generate
 
+# build shared libs
 RUN pnpm --filter @shared/logger build
 RUN pnpm --filter @shared/grpc-client-manager build
 RUN pnpm --filter @shared/kafka-manager build
 RUN pnpm --filter @shared/pg-boss-manager build
 
+# build gateway
 RUN pnpm --filter gateway build
 
-RUN pnpm prune --prod
 
-
-# ---------- PREDEPLOY ----------
+# ---------- PREDEPLOY (NEW BEST PRACTICE) ----------
 FROM build AS predeploy
 
-CMD ["sh", "-c", "echo 'no predeploy step'"]
+# создаём чистый production bundle ТОЛЬКО для gateway
+RUN pnpm deploy --filter gateway --prod /out
 
+WORKDIR /out
 
-# ---------- DEV ----------
-FROM build AS dev
-
-ENV NODE_ENV=development
-
-COPY --from=base /usr/local/bin/corepack /usr/local/bin/corepack
-RUN corepack enable
-RUN corepack prepare pnpm@8.6.3 --activate
-
-RUN chown -R node:node /usr/src/app
-
-USER node
-
-EXPOSE 50051
-EXPOSE 9090
-
-CMD ["pnpm", "--filter", "gateway", "start"]
-
-HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:9090/livez || exit 1
 
 # ---------- PROD ----------
 FROM node:22 AS prod
@@ -74,17 +57,15 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/services/gateway/node_modules ./services/gateway/node_modules
-COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
-COPY --from=build /usr/src/app/shared ./shared
+# берём только готовый deploy артефакт
+COPY --from=predeploy /out ./
 
 USER node
 
 EXPOSE 50051
 EXPOSE 9090
 
-CMD ["node", "./services/gateway/dist/app.js"]
+CMD ["node", "dist/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
