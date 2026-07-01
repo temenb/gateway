@@ -16,7 +16,7 @@ COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
-#COPY services/gateway/prisma ./services/gateway/prisma/
+COPY services/gateway/prisma ./services/gateway/prisma/
 
 # ---------- BUILD ----------
 FROM base AS build
@@ -27,14 +27,25 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
-RUN mkdir ./services/gateway/src/grpc/generated -p
+
+RUN mkdir -p ./services/gateway/src/grpc/generated
 RUN pnpm run --filter gateway proto:generate
+
 RUN pnpm --filter @shared/logger build
 RUN pnpm --filter @shared/grpc-client-manager build
-#RUN pnpm --filter @shared/kafka-manager build
-#RUN pnpm --filter @shared/pg-boss-manager build
+RUN pnpm --filter @shared/kafka-manager build
+RUN pnpm --filter @shared/pg-boss-manager build
+
 RUN pnpm --filter gateway build
+
 RUN pnpm prune --prod
+
+
+# ---------- PREDEPLOY ----------
+FROM build AS predeploy
+
+CMD ["sh", "-c", "echo 'no predeploy step'"]
+
 
 # ---------- DEV ----------
 FROM build AS dev
@@ -46,8 +57,6 @@ RUN corepack enable
 RUN corepack prepare pnpm@8.6.3 --activate
 
 RUN chown -R node:node /usr/src/app
-
-
 
 USER node
 
@@ -66,15 +75,11 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-#RUN pnpm deploy --filter gateway /out
-
-##COPY --from=build /usr/src/app /usr/src/app
-
+COPY --from=build /usr/src/app/services/gateway/prisma ./services/gateway/prisma
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/services/gateway/node_modules ./services/gateway/node_modules
 COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
 COPY --from=build /usr/src/app/shared ./shared
-
 
 USER node
 
