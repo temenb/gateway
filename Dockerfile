@@ -75,7 +75,6 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
 
-COPY --from=build /usr/src/app/services/gateway/prisma ./services/gateway/prisma
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/services/gateway/node_modules ./services/gateway/node_modules
 COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
