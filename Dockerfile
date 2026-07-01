@@ -16,7 +16,6 @@ COPY services/gateway/jest.config.js ./services/gateway/
 COPY services/gateway/tsconfig.json ./services/gateway/
 COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
-COPY services/gateway/prisma ./services/gateway/prisma/
 
 # ---------- BUILD ----------
 FROM base AS build
