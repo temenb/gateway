@@ -26,7 +26,8 @@ ENV NODE_ENV=development
 
 RUN apt-get update && apt-get install -y protobuf-compiler
 
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+
 RUN pnpm fetch
 RUN pnpm install --offline --frozen-lockfile
 
@@ -39,9 +40,6 @@ RUN pnpm --filter @shared/kafka-manager build
 RUN pnpm --filter @shared/pg-boss-manager build
 
 RUN pnpm --filter gateway build
-
-RUN pnpm prune --prod
-
 
 RUN pnpm --filter gateway deploy /deploy --prod
 
