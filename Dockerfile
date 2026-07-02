@@ -10,6 +10,7 @@ COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
 COPY proto ./proto
+COPY .npmrc ./.npmrc
 
 COPY services/gateway/package*.json ./services/gateway/
 COPY services/gateway/jest.config.js ./services/gateway/
@@ -20,6 +21,7 @@ COPY services/gateway/__tests__ ./services/gateway/__tests__/
 
 
 RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+RUN echo "===== .npmrc =====" && cat .npmrc
 RUN echo "===== . ====="
 RUN pnpm config get force-legacy-deploy
 RUN pnpm config get inject-workspace-packages
