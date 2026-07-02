@@ -43,9 +43,6 @@ RUN pnpm --filter gateway build
 
 RUN pnpm --filter gateway deploy /deploy --prod
 
-RUN #pnpm --filter gateway deploy /deploy --prod --legacy
-
-
 # ---------- PREDEPLOY ----------
 FROM node:22 AS predeploy
 
