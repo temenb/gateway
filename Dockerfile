@@ -9,7 +9,7 @@ COPY turbo.json ./
 COPY package.json ./
 COPY pnpm-workspace.yaml ./
 COPY tsconfig.base.json ./
-COPY proto ./
+COPY proto ./proto
 COPY .npmrc ./
 
 
