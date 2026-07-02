@@ -48,9 +48,9 @@ RUN pnpm --filter @shared/pg-boss-manager build
 
 RUN pnpm --filter gateway build
 
-#RUN pnpm --filter gateway deploy /deploy --prod
+RUN pnpm --filter gateway deploy /deploy --prod
 
-RUN pnpm --filter gateway deploy /deploy --prod --legacy
+RUN #pnpm --filter gateway deploy /deploy --prod --legacy
 
 
 # ---------- PREDEPLOY ----------
