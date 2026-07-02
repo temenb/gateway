@@ -19,6 +19,12 @@ COPY services/gateway/src ./services/gateway/src/
 COPY services/gateway/__tests__ ./services/gateway/__tests__/
 #COPY services/gateway/prisma ./services/gateway/prisma/
 
+
+RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
+RUN echo "===== .npmrc =====" && cat .npmrc
+RUN pnpm config get force-legacy-deploy
+RUN pnpm config get inject-workspace-packages
+
 # ---------- BUILD ----------
 FROM base AS build
 
