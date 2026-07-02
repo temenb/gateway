@@ -79,9 +79,6 @@ ENV NODE_ENV=production
 
 
 COPY --from=build /deploy .
-#COPY --from=build /usr/src/app/services/gateway/node_modules ./services/gateway/node_modules
-#COPY --from=build /usr/src/app/services/gateway/dist ./services/gateway/dist
-#COPY --from=build /usr/src/app/shared ./shared
 
 USER node
 
