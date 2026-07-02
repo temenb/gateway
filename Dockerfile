@@ -43,12 +43,6 @@ RUN pnpm --filter gateway build
 
 RUN pnpm --filter gateway deploy /deploy --prod
 
-# ---------- PREDEPLOY ----------
-FROM node:22 AS predeploy
-
-CMD ["sh", "-c", "echo 'no predeploy step'"]
-
-
 # ---------- DEV ----------
 FROM build AS dev
 
@@ -87,7 +81,12 @@ EXPOSE 9090
 
 
 CMD ["node", "dist/app.js"]
-#CMD ["node", "./services/gateway/dist/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
+
+
+# ---------- PREDEPLOY ----------
+FROM node:22 AS predeploy
+
+CMD ["sh", "-c", "echo 'no predeploy step'"]
