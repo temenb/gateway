@@ -21,7 +21,6 @@ COPY services/gateway/__tests__ ./services/gateway/__tests__/
 
 
 RUN corepack enable && corepack prepare pnpm@11.9.0 --activate
-RUN echo "===== .npmrc =====" && cat .npmrc
 RUN echo "===== . ====="
 RUN pnpm config get force-legacy-deploy
 RUN pnpm config get inject-workspace-packages
