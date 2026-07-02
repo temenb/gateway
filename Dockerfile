@@ -80,12 +80,10 @@ USER node
 EXPOSE 50051
 EXPOSE 9090
 
-
 CMD ["node", "dist/app.js"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:9090/livez || exit 1
-
 
 # ---------- PREDEPLOY ----------
 FROM node:22 AS predeploy
